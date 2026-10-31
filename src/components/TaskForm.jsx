@@ -9,6 +9,8 @@ function TaskForm({ task, onSave, onCancel }) {
   const [priority, setPriority] = useState(task ? task.priority : "medium");
   const [dueDate, setDueDate] = useState(task ? task.dueDate : "");
   const [error, setError] = useState("");
+  const now = new Date();
+  const minDueDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
 
   function handleSave() {
     if (title.trim() === "") {
@@ -17,6 +19,10 @@ function TaskForm({ task, onSave, onCancel }) {
     }
     if (title.trim().length > 60) {
       setError("Title must be under 60 characters");
+      return;
+    }
+    if (dueDate && dueDate < minDueDate) {
+      setError("Due date cannot be before today");
       return;
     }
     onSave({ title: title.trim(), description: description.trim(), priority, dueDate });
@@ -53,7 +59,7 @@ function TaskForm({ task, onSave, onCancel }) {
 
         <label>
           Due date
-          <input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
+          <input type="date" min={minDueDate} value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
         </label>
 
         <div className="modal-btns">
